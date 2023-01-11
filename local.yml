@@ -1,0 +1,29 @@
+version: '3'
+
+volumes:
+  dbdata: { }
+
+services:
+  postgres:
+    image: postgres:13-alpine
+    container_name: photo_manager-postgres
+    env_file: envs/.env
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+  web:
+    &django
+    build:
+      context: .
+      dockerfile: ./docker/web/Dockerfile
+    image: photo_manager_django
+    container_name: photo_mager-django
+    volumes:
+      - .:/src
+    depends_on:
+      - postgres
+    env_file: envs/.env
+    ports:
+      - "8000:8000"
+    command: /start
